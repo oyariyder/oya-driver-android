@@ -84,9 +84,9 @@ fun Onboarding(navController: NavController){
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFEEECE9))
+            .background(MaterialTheme.colorScheme.background)
             .padding(8.dp),
-        containerColor = Color(0xFFEEECE9),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -102,7 +102,7 @@ fun Onboarding(navController: NavController){
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFEEECE9))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -148,14 +148,14 @@ fun Onboarding(navController: NavController){
                 ) {
                     Text(
                         "Select your location",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         "Choose the city where you’ll be driving and earning.",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -181,14 +181,14 @@ fun Onboarding(navController: NavController){
                 ) {
                     Text(
                         "Add a profile picture",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         "Upload a clear photo for easy recognition and identity verification.",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -214,14 +214,14 @@ fun Onboarding(navController: NavController){
                 ) {
                     Text(
                         "Driver  License",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         "Add a valid driver’s license for the location you want to drive in.",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -247,14 +247,14 @@ fun Onboarding(navController: NavController){
                 ) {
                     Text(
                         "Select Vehicle type",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         "Pick the type of vehicle you’ll use for rides",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -280,14 +280,14 @@ fun Onboarding(navController: NavController){
                 ) {
                     Text(
                         "Vehicle Document",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         "Provide the Insurance Policy documents and Vehicle Inspection Report for your vehicle to be approved.",
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -306,7 +306,7 @@ fun Onboarding(navController: NavController){
                     onClick = {
                         // 1. Launch a coroutine to handle the suspend function
                         scope.launch {
-                            navController.navigate("OtpScreen/fullPhoneNumber=${email}")
+                            navController.navigate("Welcome")
                         }
 
                     },
@@ -315,8 +315,8 @@ fun Onboarding(navController: NavController){
                     ,
                     shape = RoundedCornerShape(16), // Set the shape to RectangleShape
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black, // Set the button's background color
-                        contentColor = Color.White // Set the color for the content (Icon and Text)
+                        containerColor =  MaterialTheme.colorScheme.inverseSurface,  // Set the button's background color
+                        contentColor = MaterialTheme.colorScheme.inverseOnSurface, // Set the color for the content (Icon and Text)
                     ),
                     contentPadding = PaddingValues(all = 12.dp)
                 ){

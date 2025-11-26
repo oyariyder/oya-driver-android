@@ -1,30 +1,22 @@
-package com.oyariyders.driver.presentation.biodata
+package com.oyariyders.driver.presentation.loginemail
 
-import android.content.ContentValues
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.oyariyders.driver.domain.model.Driver
 import com.oyariyders.driver.presentation.UiEvent
-import com.oyariyders.driver.utils.Result
 import com.oyariyders.driver.repository.DriverRepository
+import com.oyariyders.driver.utils.Result
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class BioDataViewModel (val repository: DriverRepository) : ViewModel() {
 
+class LoginEmailViewModel(
+    val repository: DriverRepository
+): ViewModel () {
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
-
-    private val _shouldContinue = MutableStateFlow(false)
-    val shouldContinue = _shouldContinue.asStateFlow()
-
-    fun toggleButtonState(state: Boolean){
-        _shouldContinue.value = state
-    }
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -33,18 +25,18 @@ class BioDataViewModel (val repository: DriverRepository) : ViewModel() {
         _isLoading.value = state
     }
 
-    fun signUp(driver: Driver) {
+    fun sendEmailOtp(mail: String) {
         viewModelScope.launch {
             _eventFlow.emit(UiEvent.Loading(true))
-            val apiResult =  repository.signUp(driver)
+            val apiResult =  repository.sendEmailOtp(mail)
             when(apiResult){
                 is Result.Error -> {
                     _eventFlow.emit(UiEvent.Loading(false))
-                    _eventFlow.emit(UiEvent.ShowMessage(apiResult.message ?: "Error creating user account"))
+                    _eventFlow.emit(UiEvent.ShowMessage(apiResult.message ?: "Error sending OTP"))
                 }
                 is Result.Success -> {
                     _eventFlow.emit(UiEvent.Loading(false))
-                    _eventFlow.emit(UiEvent.ShowSuccess("Created user account"))
+                    _eventFlow.emit(UiEvent.ShowSuccess("Email OTP sent"))
                 }
             }
         }

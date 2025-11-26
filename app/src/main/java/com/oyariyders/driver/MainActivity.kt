@@ -2,7 +2,9 @@ package com.oyariyders.driver
 
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import android.credentials.GetCredentialException
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -26,6 +28,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -38,6 +44,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -49,7 +56,9 @@ import com.oyariyders.driver.presentation.biodata.BioDataViewModel
 import com.oyariyders.driver.presentation.brandpage.BrandPage
 import com.oyariyders.driver.presentation.emailotp.EmailOtp
 import com.oyariyders.driver.presentation.emailotp.EmailOtpViewModel
+import com.oyariyders.driver.presentation.home.HomeScreen
 import com.oyariyders.driver.presentation.loginemail.LoginEmailPage
+import com.oyariyders.driver.presentation.loginemail.LoginEmailViewModel
 import com.oyariyders.driver.presentation.loginphone.LoginPhone
 import com.oyariyders.driver.presentation.loginphone.LoginPhoneViewModel
 import com.oyariyders.driver.presentation.onboarding.Onboarding
@@ -57,6 +66,7 @@ import com.oyariyders.driver.presentation.otp.OTPScreenViewModel
 import com.oyariyders.driver.presentation.otp.OtpScreen
 import com.oyariyders.driver.presentation.phonenumberoptions.PhoneNumberOptions
 import com.oyariyders.driver.presentation.phonenumberoptions.PhoneNumberOptionsViewModel
+import com.oyariyders.driver.presentation.welcome.Welcome
 import com.oyariyders.driver.repository.DriverRepository
 import com.oyariyders.driver.retrofit.InitializeRetrofit
 import com.oyariyders.driver.ui.theme.DriverTheme
@@ -69,8 +79,11 @@ import java.util.Base64
 import kotlin.getValue
 import kotlin.time.Duration.Companion.seconds
 
+
 class MainActivity : ComponentActivity() {
+    private var navController: NavHostController? = null
     private val viewModel by viewModels<MainViewModel>()
+    private var currentAppIntent by mutableStateOf(intent)
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,14 +94,18 @@ class MainActivity : ComponentActivity() {
                 }
             }
         super.onCreate(savedInstanceState)
+        currentAppIntent = intent
         val webClientId = "385918954773-5pr7pj21nh6kp5vvkkcmane6a40b3a16.apps.googleusercontent.com"
         enableEdgeToEdge()
         setContent {
             DriverTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    val navController = rememberNavController()
+                    val controller = rememberNavController()
+                    navController = controller
+
+                    DeepLinkHandler(controller, currentAppIntent)
                     NavHost(
-                        navController = navController,
+                        navController = controller,
                         startDestination = "BrandPage",
                         enterTransition = { EnterTransition.None },
                         exitTransition = { ExitTransition.None }
@@ -117,7 +134,7 @@ class MainActivity : ComponentActivity() {
                             }
                         ) {
                             val phoneLoginViewModel = viewModel<LoginPhoneViewModel>()
-                            LoginPhone(navController, phoneLoginViewModel)
+                            LoginPhone(controller, phoneLoginViewModel)
                         }
                         composable(
                             route = "BrandPage",
@@ -143,7 +160,7 @@ class MainActivity : ComponentActivity() {
                             }
                         ) {
                             //val phoneLoginViewModel = viewModel<LoginPhoneViewModel>()
-                            BrandPage(navController)
+                            BrandPage(controller)
                         }
                         composable(
                             route = "PhoneNumberOptions?fullPhoneNumber={fullPhoneNumber}",
@@ -155,13 +172,12 @@ class MainActivity : ComponentActivity() {
 
                             val fullPhoneNumber = backStackEntry.arguments?.getString("fullPhoneNumber")
                             val repository = DriverRepository(InitializeRetrofit.driverApi)
-
                             val phoneLoginViewModel = viewModel<LoginPhoneViewModel>()
                             val phoneVM = viewModel<PhoneNumberOptionsViewModel>(){
                                 PhoneNumberOptionsViewModel(repository)
                             }
                             PhoneNumberOptions(
-                                navController,
+                                controller,
                                 phoneVM,
                                 phoneLoginViewModel,
                                 phoneNumber = fullPhoneNumber
@@ -183,15 +199,18 @@ class MainActivity : ComponentActivity() {
                                 SignUpViewModel(repository)
                             }
                             OtpScreen(
-                                navController,
+                                controller,
                                 phoneNumber = fullPhoneNumber,
                                 screenModel = signUpViewModel,
                                 viewModel = otpScreenOptionsViewModel
                             )
                         }
                         composable(route = "LoginEmailPage") {
-                            //val phoneLoginViewModel = viewModel<LoginPhoneViewModel>()
-                            LoginEmailPage(navController, webClientId)
+                            val repository = DriverRepository(InitializeRetrofit.driverApi)
+                            val loginEmailViewModel = viewModel<LoginEmailViewModel>(){
+                                LoginEmailViewModel(repository)
+                            }
+                            LoginEmailPage(controller, loginEmailViewModel)
                         }
                         composable(
                             route = "EmailOtp/fullPhoneNumber={fullPhoneNumber}",
@@ -208,7 +227,7 @@ class MainActivity : ComponentActivity() {
                                 SignUpViewModel(repository)
                             }
                             EmailOtp(
-                                navController,
+                                controller,
                                 screenModel = signUpViewModel,
                                 viewModel = emailOtpViewModel,
                                 email = fullPhoneNumber
@@ -219,19 +238,34 @@ class MainActivity : ComponentActivity() {
                             val biodataVM = viewModel<BioDataViewModel>(){
                                 BioDataViewModel(repository)
                             }
-                            BioData(navController, biodataVM)
+                            BioData(controller, biodataVM)
                         }
                         composable(route = "Onboarding") {
                             //val repository = DriverRepository(InitializeRetrofit.driverApi)
 //                            val biodataVM = viewModel<BioDataViewModel>(){
 //                                BioDataViewModel(repository)
 //                            }
-                            Onboarding(navController)
+                            Onboarding(controller)
+                        }
+                        composable(route = "Welcome") {
+                            //val repository = DriverRepository(InitializeRetrofit.driverApi)
+//                            val biodataVM = viewModel<BioDataViewModel>(){
+//                                BioDataViewModel(repository)
+//                            }
+                            Welcome(controller)
+                        }
+                        composable(route = "HomeScreen") {
+                            HomeScreen(controller)
                         }
                     }
                 }
             }
         }
+    }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        currentAppIntent = intent
     }
 }
 
@@ -304,7 +338,6 @@ suspend fun signIn(request: GetCredentialRequest, context: Context, navControlle
     }
     return e
 }
-
 //This function is used to generate a secure nonce to pass in with our request
 @RequiresApi(Build.VERSION_CODES.O)
 fun generateSecureRandomNonce(byteLength: Int = 32): String {
@@ -314,17 +347,25 @@ fun generateSecureRandomNonce(byteLength: Int = 32): String {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+private fun DeepLinkHandler(navController: NavHostController, intent: Intent) {
+    // Extract deep link information
+    val appLinkAction: String? = intent.action
+    val appLinkData: Uri? = intent.data
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DriverTheme {
-        Greeting("Android")
+    // LaunchedEffect ensures this code runs in the Composition, guaranteeing the navController exists.
+    // It re-runs whenever appLinkAction or appLinkData (from the state update in onNewIntent) changes.
+    LaunchedEffect(appLinkAction, appLinkData) {
+        if (Intent.ACTION_VIEW == appLinkAction) {
+            // This is a basic way to check the deep link root path.
+            // val targetRoute = appLinkData.pathSegments.firstOrNull() ?: ""
+            navController.navigate("BioData") {
+                // This clears the back stack up to the start destination.
+                popUpTo(navController.graph.startDestinationId) {
+                    inclusive = true
+                }
+                // Prevent creating multiple copies of the same destination on the stack
+                launchSingleTop = true
+            }
+        }
     }
 }

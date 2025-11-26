@@ -1,6 +1,7 @@
 package com.oyariyders.driver.presentation.phonenumberoptions
 
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +14,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class PhoneNumberOptionsViewModel(val repository: DriverRepository): ViewModel() {
+class PhoneNumberOptionsViewModel(
+    val repository: DriverRepository,
+): ViewModel() {
     // State to hold the phone number
     private val _phoneNumber = MutableStateFlow<String?>(null)
     val phoneNumber = _phoneNumber.asStateFlow()
@@ -46,15 +49,13 @@ class PhoneNumberOptionsViewModel(val repository: DriverRepository): ViewModel()
             when(apiResult){
                 is Result.Error -> {
                     _eventFlow.emit(UiEvent.Loading(false))
-                    //_eventFlow.emit(UiEvent.ShowMessage(apiResult.message ?: "Error sending OTP"))
-                    _eventFlow.emit(UiEvent.ShowSuccess("OTP sent"))
+                    _eventFlow.emit(UiEvent.ShowMessage(apiResult.message ?: "Error sending OTP"))
                 }
                 is Result.Success -> {
                     _eventFlow.emit(UiEvent.Loading(false))
-                    Log.i(ContentValues.TAG, apiResult.data.toString())
+                    _eventFlow.emit(UiEvent.ShowSuccess("OTP sent"))
                 }
             }
         }
     }
-
 }

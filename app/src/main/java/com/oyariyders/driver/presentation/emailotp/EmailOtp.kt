@@ -81,9 +81,9 @@ fun EmailOtp(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFEEECE9))
+            .background(MaterialTheme.colorScheme.background)
             .padding(8.dp),
-        containerColor = Color(0xFFEEECE9),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -99,7 +99,7 @@ fun EmailOtp(
                             navController.popBackStack()
                         },
                         colors =  IconButtonDefaults.iconButtonColors(
-                            containerColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface
                         ),
                     ) {
                         Icon(
@@ -141,7 +141,7 @@ fun EmailOtp(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFEEECE9))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding),
         ){
             // You can now use signUpUiState to control dialogs, show errors, etc.
@@ -190,8 +190,8 @@ fun EmailOtp(
                     .padding(12.dp),
                 shape = RoundedCornerShape(16), // Set the shape to RectangleShape
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black, // Set the button's background color
-                    contentColor = Color.White // Set the color for the content (Icon and Text)
+                    containerColor =  MaterialTheme.colorScheme.inverseSurface,  // Set the button's background color
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface, // Set the color for the content (Icon and Text)
                 ),
                 contentPadding = PaddingValues(all = 12.dp)
             ){
@@ -206,7 +206,6 @@ fun EmailOtp(
                     Spacer(modifier = Modifier.width(8.dp)) // Adds space between icon and text
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        tint = colorResource(R.color.white),
                         contentDescription = "Arrow Forward Icon"
                     )
                 }
@@ -270,7 +269,7 @@ fun OtpArea(
         ){
             AssistChip(
                 onClick = {
-                    screenModel.onEvent(PhoneNumberOptionsEvent.EnteredPhoneNum(phoneNumber ?: ""))
+                    screenModel.resendEmailOtp(phoneNumber ?: "")
                     //Resend Whatsapp OTP
                     viewModel.startTimer()
                 },
@@ -289,12 +288,12 @@ fun OtpArea(
                     }
                 },
                 colors = AssistChipDefaults.assistChipColors(
-                    containerColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.surface,
                 ),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        tint = if (isTimerRunning) Color.LightGray else Color.Black,
+                        tint =  if (isTimerRunning) Color.LightGray else MaterialTheme.colorScheme.onSurface,
                         contentDescription = "Resend",
                         modifier = Modifier.size(AssistChipDefaults.IconSize),
                     )

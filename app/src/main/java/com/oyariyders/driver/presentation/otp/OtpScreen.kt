@@ -94,9 +94,9 @@ fun OtpScreen(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFEEECE9))
+            .background(MaterialTheme.colorScheme.background)
             .padding(8.dp),
-        containerColor = Color(0xFFEEECE9),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -112,7 +112,7 @@ fun OtpScreen(
                             navController.popBackStack()
                         },
                         colors =  IconButtonDefaults.iconButtonColors(
-                            containerColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface
                         ),
                     ) {
                         Icon(
@@ -136,7 +136,7 @@ fun OtpScreen(
                     }
 
                     is UiEvent.ShowSuccess -> {
-                        //snackbarHostState.showSnackbar(message = event.message)
+                        //screenModel.saveAccessToken(event.message)
                         navigateToEmail = true
                     }
                 }
@@ -154,7 +154,7 @@ fun OtpScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFEEECE9))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding),
         ){
             // You can now use signUpUiState to control dialogs, show errors, etc.
@@ -200,13 +200,14 @@ fun OtpScreen(
                 onClick = {
                     screenModel.verifyOtp(phoneNumber ?: "")
                 },
+                //enabled = shouldContinue,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp),
                 shape = RoundedCornerShape(16), // Set the shape to RectangleShape
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black, // Set the button's background color
-                    contentColor = Color.White // Set the color for the content (Icon and Text)
+                    containerColor = MaterialTheme.colorScheme.inverseSurface, // Set the button's background color
+                    contentColor =  MaterialTheme.colorScheme.inverseOnSurface,// Set the color for the content (Icon and Text)
                 ),
                 contentPadding = PaddingValues(all = 12.dp)
             ){
@@ -221,7 +222,6 @@ fun OtpScreen(
                     Spacer(modifier = Modifier.width(8.dp)) // Adds space between icon and text
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        tint = colorResource(R.color.white),
                         contentDescription = "Arrow Forward Icon"
                     )
                 }
@@ -261,7 +261,7 @@ fun OtpArea(
         Spacer(Modifier.height(10.dp))
         Text(
             "We have sent a 6 digit code to $maskedNumber .",
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onSurface,
             fontFamily = PlusJakartaSansFontFamily,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold
@@ -294,7 +294,9 @@ fun OtpArea(
                 enabled = !isTimerRunning,
                 label = {
                     Row {
-                        Text("Get code on WhatsApp")
+                        Text(
+                            "Get code on WhatsApp",
+                        )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = if (isTimerRunning) {
@@ -306,14 +308,14 @@ fun OtpArea(
                     }
                 },
                 colors = AssistChipDefaults.assistChipColors(
-                    containerColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.surface,
                 ),
                 leadingIcon = {
                     Icon(
                         painter = painterResource(R.drawable.whatsapp),
                         contentDescription = "Whatsapp Selection",
                         modifier = Modifier.size(AssistChipDefaults.IconSize),
-                        tint = if (isTimerRunning) Color.LightGray else Color.Black,
+                        tint = if (isTimerRunning) Color.LightGray else MaterialTheme.colorScheme.onSurface,
                     )
                 }
             )
@@ -326,7 +328,9 @@ fun OtpArea(
                 enabled = !isSmsTimerRunning,
                 label = {
                     Row {
-                        Text("Get SMS  code")
+                        Text(
+                            "Get SMS  code",
+                        )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = if (isSmsTimerRunning) {
@@ -338,14 +342,14 @@ fun OtpArea(
                     }
                 },
                 colors = AssistChipDefaults.assistChipColors(
-                    containerColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.surface,
                 ),
                 leadingIcon = {
                     Icon(
                         painter = painterResource(R.drawable.message_text),
                         contentDescription = "SMS Selection",
                         modifier = Modifier.size(AssistChipDefaults.IconSize),
-                        tint = if (isSmsTimerRunning) Color.LightGray else Color.Black,
+                        tint = if (isTimerRunning) Color.LightGray else MaterialTheme.colorScheme.onSurface,
                     )
                 }
             )
@@ -380,7 +384,7 @@ fun OTPInputTextFields(
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp)
                     .shadow(4.dp, shape = RoundedCornerShape(12.dp))
-                    .background(colorResource(R.color.white))
+                    .background(MaterialTheme.colorScheme.surface)
                     .focusRequester(focusRequesters[index])
                     .onKeyEvent { keyEvent ->
                         if (keyEvent.key == Key.Backspace) {
@@ -399,8 +403,8 @@ fun OTPInputTextFields(
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
                     // Ensure the background is solid white for the shape to be visible
-                    unfocusedContainerColor = Color.White,
-                    focusedContainerColor = Color.White
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
                 value = value,
                 onValueChange = { newValue ->

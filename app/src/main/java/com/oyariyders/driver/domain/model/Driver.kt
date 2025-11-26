@@ -4,8 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Driver(
-    val firstName: String,
-    val lastName: String,
-    val phoneNumber: String,
-    val emailAddress: String,
+    val email: String,
+    val password: String,
+    val data: UserData
 )

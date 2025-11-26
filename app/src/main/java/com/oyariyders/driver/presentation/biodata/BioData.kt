@@ -52,6 +52,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.oyariyders.driver.R
 import com.oyariyders.driver.domain.model.Driver
+import com.oyariyders.driver.domain.model.UserData
 import com.oyariyders.driver.presentation.UiEvent
 import com.oyariyders.driver.presentation.loginemail.isValidEmail
 import com.oyariyders.driver.ui.theme.PlusJakartaSansFontFamily
@@ -78,9 +79,9 @@ fun BioData(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFEEECE9))
+            .background(MaterialTheme.colorScheme.background)
             .padding(8.dp),
-        containerColor = Color(0xFFEEECE9),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -96,7 +97,7 @@ fun BioData(
                             navController.popBackStack()
                         },
                         colors =  IconButtonDefaults.iconButtonColors(
-                            containerColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface
                         ),
                     ) {
                         Icon(
@@ -129,7 +130,7 @@ fun BioData(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFEEECE9))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
@@ -154,7 +155,7 @@ fun BioData(
             Spacer(Modifier.height(10.dp))
             Text(
                 "Enter your name as it appears on your ID or Passport",
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontFamily = PlusJakartaSansFontFamily,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -221,9 +222,10 @@ fun BioData(
             Spacer(Modifier.height(48.dp))
             Button(
                 onClick = {
-                    val rider = Driver(firstName, lastName, phoneNumber, emailAddress)
+                    val userData = UserData(firstName, phoneNumber)
+                    val driver = Driver(firstName, "1234567",userData)
                     scope.launch {
-                        viewModel.signUp(rider)
+                        viewModel.signUp(driver)
                     }
                 },
                 enabled = shouldContinue,
@@ -232,8 +234,8 @@ fun BioData(
                     .padding(12.dp),
                 shape = RoundedCornerShape(16), // Set the shape to RectangleShape
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black, // Set the button's background color
-                    contentColor = Color.White // Set the color for the content (Icon and Text)
+                    containerColor = MaterialTheme.colorScheme.inverseSurface, // Set the button's background color
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface  // Set the color for the content (Icon and Text)
                 ),
                 contentPadding = PaddingValues(all = 12.dp)
             ){
@@ -248,7 +250,6 @@ fun BioData(
                     Spacer(modifier = Modifier.width(8.dp)) // Adds space between icon and text
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        tint = colorResource(R.color.white),
                         contentDescription = "Arrow Forward Icon"
                     )
                 }

@@ -3,8 +3,6 @@ package com.oyariyders.driver.domain.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserInfo(
-    val phone: String,
-    val token: String,
-    val type: String
+data class PhoneRequest (
+    val phone: String
 )

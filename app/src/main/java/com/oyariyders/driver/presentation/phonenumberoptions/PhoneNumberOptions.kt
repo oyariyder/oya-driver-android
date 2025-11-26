@@ -74,7 +74,7 @@ fun PhoneNumberOptions(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFEEECE9))
+            .background(MaterialTheme.colorScheme.background)
             .padding(8.dp),
         topBar = {
             TopAppBar(
@@ -91,7 +91,7 @@ fun PhoneNumberOptions(
                             navController.popBackStack()
                         },
                         colors =  IconButtonDefaults.iconButtonColors(
-                            containerColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface
                         ),
                     ) {
                         Icon(
@@ -132,7 +132,7 @@ fun PhoneNumberOptions(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFEEECE9))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
@@ -156,7 +156,7 @@ fun PhoneNumberOptions(
             }
             Text(
                 "Enter your phone number",
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontFamily = PlusJakartaSansFontFamily,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
@@ -168,7 +168,7 @@ fun PhoneNumberOptions(
             )
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement =  Arrangement.Center
@@ -179,7 +179,6 @@ fun PhoneNumberOptions(
                         scope.launch {
                             //Verify that phonenumber isn't empty or invalid
                             phoneNumberOptionsViewModel.onEvent(PhoneNumberOptionsEvent.EnteredPhoneNum(viewModel.phoneNumber.value.toString()))
-                            //navController.navigate("OtpScreen/fullPhoneNumber=${viewModel.phoneNumber.value.toString()}")
                         }
 
                     },
@@ -189,8 +188,8 @@ fun PhoneNumberOptions(
                     ,
                     shape = RoundedCornerShape(16), // Set the shape to RectangleShape
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black, // Set the button's background color
-                        contentColor = Color.White // Set the color for the content (Icon and Text)
+                        containerColor = MaterialTheme.colorScheme.inverseSurface, // Set the button's background color
+                        contentColor = MaterialTheme.colorScheme.inverseOnSurface  // Set the color for the content (Icon and Text)
                     ),
                     contentPadding = PaddingValues(all = 12.dp)
                 ){
@@ -205,7 +204,6 @@ fun PhoneNumberOptions(
                         Spacer(modifier = Modifier.width(8.dp)) // Adds space between icon and text
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            tint = colorResource(R.color.white),
                             contentDescription = "Add Icon"
                         )
                     }

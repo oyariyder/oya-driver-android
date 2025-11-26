@@ -1,8 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.services)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.maps.secrets)
 }
 
 android {
@@ -54,12 +56,16 @@ dependencies {
     implementation(libs.xmaterialccp)
     implementation(libs.androidx.compose.ui.text.google.fonts)
     implementation(libs.androidx.navigation.compose)
+    // Google Maps for Compose
+    implementation(libs.google.maps.compose)
+    implementation(libs.google.play.services.maps)
     implementation(libs.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.squareup.kotlinx.serialization)
     implementation(libs.squareup.retrofit)
     implementation(libs.squareup.okhttp3)
+    implementation(libs.squareup.okhttp3.logger)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

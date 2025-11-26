@@ -1,6 +1,8 @@
 package com.oyariyders.driver.presentation.loginemail
 
+import android.content.ContentValues.TAG
 import android.os.Build
+import android.util.Log
 import android.util.Patterns
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -27,6 +29,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +44,8 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,32 +62,42 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.oyariyders.driver.R
 import com.oyariyders.driver.generateSecureRandomNonce
+import com.oyariyders.driver.presentation.UiEvent
 import com.oyariyders.driver.signIn
 import com.oyariyders.driver.ui.theme.PlusJakartaSansFontFamily
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginEmailPage(navController: NavController, webClientId: String){
+fun LoginEmailPage(
+    navController: NavController,
+    loginEmailViewModel: LoginEmailViewModel
+    ){
     val scope = rememberCoroutineScope()
     var email by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
+    val isLoading by loginEmailViewModel.isLoading.collectAsState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    // Create a local state to trigger navigation
+    var navigateToOtpScreen by remember { mutableStateOf(false) }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFEEECE9))
+            .background(MaterialTheme.colorScheme.background)
             .padding(8.dp),
-        containerColor = Color(0xFFEEECE9),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -98,7 +113,7 @@ fun LoginEmailPage(navController: NavController, webClientId: String){
                             navController.popBackStack()
                         },
                         colors =  IconButtonDefaults.iconButtonColors(
-                            containerColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface
                         ),
                     ) {
                         Icon(
@@ -110,18 +125,59 @@ fun LoginEmailPage(navController: NavController, webClientId: String){
             )
         },
     ){ innerPadding ->
+        LaunchedEffect(true) {
+            loginEmailViewModel.eventFlow.collectLatest { event ->
+                when (event) {
+                    is UiEvent.ShowMessage -> {
+                        snackbarHostState.showSnackbar(message = event.message)
+                    }
+
+                    is UiEvent.Loading -> {
+                        loginEmailViewModel.setLoadingDialogState(event.boolean)
+                    }
+                    is UiEvent.ShowSuccess -> {
+                        navigateToOtpScreen = true
+                    }
+                }
+            }
+        }
+        LaunchedEffect(navigateToOtpScreen) {
+            if (navigateToOtpScreen) {
+                // 3. Perform the navigation here.
+                // This effect won't be cancelled by the loading state change.
+                navController.navigate("EmailOtp/fullPhoneNumber=${email}")
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFEEECE9))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
+            if (isLoading) {
+                Dialog(onDismissRequest = {
+                    loginEmailViewModel.setLoadingDialogState(false)
+                })
+                {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.width(64.dp),
+                            color = MaterialTheme.colorScheme.secondary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
+                    }
+                }
+            }
             Spacer(Modifier.height(10.dp))
             Text(
                 "Enter your email address",
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontFamily = PlusJakartaSansFontFamily,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
@@ -162,7 +218,7 @@ fun LoginEmailPage(navController: NavController, webClientId: String){
             Spacer(Modifier.height(8.dp))
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.surface,
                 ),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
@@ -178,6 +234,7 @@ fun LoginEmailPage(navController: NavController, webClientId: String){
 
                     Text(
                         text = "Continue with socials",
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
                     )
@@ -218,6 +275,7 @@ fun LoginEmailPage(navController: NavController, webClientId: String){
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 text = "Continue with Google",
+                                color = MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp,
                                 textAlign = TextAlign.Center,
@@ -229,7 +287,7 @@ fun LoginEmailPage(navController: NavController, webClientId: String){
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.arrow_right),
-                                    tint = Color.Black,
+                                    tint = MaterialTheme.colorScheme.onSurface,
                                     contentDescription = "Arrow Forward"
                                 )
                             }
@@ -247,20 +305,15 @@ fun LoginEmailPage(navController: NavController, webClientId: String){
             ) {
                 Button(
                     onClick = {
-                        // 1. Launch a coroutine to handle the suspend function
-                        scope.launch {
-                            navController.navigate("EmailOtp/fullPhoneNumber=${email}")
-                        }
-
+                        loginEmailViewModel.sendEmailOtp(email)
                     },
                     enabled = isValidEmail(email),
                     modifier = Modifier
-                        .fillMaxWidth()
-                    ,
+                        .fillMaxWidth(),
                     shape = RoundedCornerShape(16), // Set the shape to RectangleShape
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black, // Set the button's background color
-                        contentColor = Color.White // Set the color for the content (Icon and Text)
+                        containerColor =  MaterialTheme.colorScheme.inverseSurface, // Set the button's background color
+                        contentColor = MaterialTheme.colorScheme.inverseOnSurface, // Set the color for the content (Icon and Text)
                     ),
                     contentPadding = PaddingValues(all = 12.dp)
                 ){
@@ -272,7 +325,6 @@ fun LoginEmailPage(navController: NavController, webClientId: String){
                         Spacer(modifier = Modifier.width(8.dp)) // Adds space between icon and text
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            tint = colorResource(R.color.white),
                             contentDescription = "Add Icon"
                         )
                     }

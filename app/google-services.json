@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "385918954773",
+    "project_id": "pragmatic-aegis-393105",
+    "storage_bucket": "pragmatic-aegis-393105.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:385918954773:android:d8e83a140bd5e15a860d1c",
+        "android_client_info": {
+          "package_name": "com.oyariyders.driver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBs6by8ximuS293vAjoxDLQ9Cmma9K2Bsw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:385918954773:android:b17f63cc218cced3860d1c",
+        "android_client_info": {
+          "package_name": "com.oyariyders.rider"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBs6by8ximuS293vAjoxDLQ9Cmma9K2Bsw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

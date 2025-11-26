@@ -1,43 +1,59 @@
 package com.oyariyders.driver.repository
 
+import com.oyariyders.driver.domain.model.AuthResponse
 import com.oyariyders.driver.domain.model.Driver
+import com.oyariyders.driver.domain.model.EmailRequest
 import com.oyariyders.driver.utils.Result
 import com.oyariyders.driver.domain.model.OTP
+import com.oyariyders.driver.domain.model.PhoneRequest
 import com.oyariyders.driver.domain.model.UserInfo
 import com.oyariyders.driver.retrofit.DriverApi
 
 
 class DriverRepository(val api: DriverApi) {
-    suspend fun sendOtp(path: String): Result<OTP> {
+    val apiKey = "sb_secret_cKc-dtiOw_g61teXNFKu2w_FPOWM5aG"
+    suspend fun sendOtp(path: String): Result<Unit> {
+        val phone = path.removePrefix("+")
+       val phoneReq = PhoneRequest(phone)
         val response = try {
-            api.sendOtp(path)
+            api.sendOtp(apiKey, phoneReq)
         }catch(e: Exception){
             return Result.Error(e.message ?: "Unknown error")
         }
         return Result.Success(response)
     }
 
-    suspend fun verifyOtp(userInfo: UserInfo): Result<OTP> {
+    suspend fun sendEmailOtp(mail: String): Result<Unit> {
+        val email = EmailRequest(mail)
         val response = try {
-            api.verifyOtp(userInfo)
+            api.sendEmailOtp(apiKey, email)
         }catch(e: Exception){
             return Result.Error(e.message ?: "Unknown error")
         }
         return Result.Success(response)
     }
 
-    suspend fun signUp(driver: Driver): Result<OTP> {
+    suspend fun verifyOtp(userInfo: UserInfo): Result<AuthResponse> {
         val response = try {
-            api.signUp(driver)
+            api.verifyOtp(apiKey, userInfo)
         }catch(e: Exception){
             return Result.Error(e.message ?: "Unknown error")
         }
         return Result.Success(response)
     }
 
-    suspend fun recoverAccount(emailAddress: String): Result<OTP> {
+    suspend fun signUp(driver: Driver): Result<Unit> {
         val response = try {
-            api.recoverAccount(emailAddress)
+            //api.signUp(apiKey, driver)
+        }catch(e: Exception){
+            return Result.Error(e.message ?: "Unknown error")
+        }
+        return Result.Success(response)
+    }
+
+    suspend fun recoverAccount(emailAddress: String): Result<Unit> {
+        val response = try {
+            api.recoverAccount(apiKey, emailAddress)
         }catch(e: Exception){
             return Result.Error(e.message ?: "Unknown error")
         }

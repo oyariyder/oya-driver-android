@@ -259,7 +259,7 @@ fun SelectCountryWithCountryCode(
             text = phoneNumber.value,
             onValueChange = { newNumber: String ->
                 phoneNumber.value = newNumber
-                viewModel.onPhoneNumberChange(newNumber)
+                viewModel.onPhoneNumberChange("$phoneCode$newNumber")
                 isValidPhone = checkPhoneNumber(
                     phone = newNumber,
                     fullPhoneNumber = "$phoneCode$newNumber",
