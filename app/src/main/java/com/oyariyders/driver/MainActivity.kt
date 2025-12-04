@@ -51,12 +51,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.oyariyders.driver.presentation.PhotoReview
+import com.oyariyders.driver.presentation.PhotoUpload
 import com.oyariyders.driver.presentation.biodata.BioData
 import com.oyariyders.driver.presentation.biodata.BioDataViewModel
 import com.oyariyders.driver.presentation.brandpage.BrandPage
 import com.oyariyders.driver.presentation.emailotp.EmailOtp
 import com.oyariyders.driver.presentation.emailotp.EmailOtpViewModel
 import com.oyariyders.driver.presentation.home.HomeScreen
+import com.oyariyders.driver.presentation.location.Location
 import com.oyariyders.driver.presentation.loginemail.LoginEmailPage
 import com.oyariyders.driver.presentation.loginemail.LoginEmailViewModel
 import com.oyariyders.driver.presentation.loginphone.LoginPhone
@@ -205,22 +208,44 @@ class MainActivity : ComponentActivity() {
                                 viewModel = otpScreenOptionsViewModel
                             )
                         }
-                        composable(route = "LoginEmailPage") {
-                            val repository = DriverRepository(InitializeRetrofit.driverApi)
-                            val loginEmailViewModel = viewModel<LoginEmailViewModel>(){
-                                LoginEmailViewModel(repository)
-                            }
-                            LoginEmailPage(controller, loginEmailViewModel)
-                        }
                         composable(
-                            route = "EmailOtp/fullPhoneNumber={fullPhoneNumber}",
+                            route = "LoginEmailPage?fullPhoneNumber={fullPhoneNumber}&accessToken={accessToken}",
                             arguments = listOf(navArgument( name = "fullPhoneNumber") {
                                 type = NavType.StringType
                                 nullable = true
                                 defaultValue = null
-                            })) { backStackEntry ->
+                            },
+                                navArgument( name = "accessToken") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                }
+                            )
+                        ) { backStackEntry ->
+                            val number = backStackEntry.arguments?.getString("fullPhoneNumber") ?: ""
+                            val token = backStackEntry.arguments?.getString("accessToken") ?: ""
+                            val repository = DriverRepository(InitializeRetrofit.driverApi)
+                            val loginEmailViewModel = viewModel<LoginEmailViewModel>(){
+                                LoginEmailViewModel(repository)
+                            }
+                            LoginEmailPage(controller, loginEmailViewModel,number, token)
+                        }
+                        composable(
+                            route = "EmailOtp/fullPhoneNumber={fullPhoneNumber}&accessToken={accessToken}",
+                            arguments = listOf(navArgument( name = "fullPhoneNumber") {
+                                type = NavType.StringType
+                                nullable = true
+                                defaultValue = null
+                            },
+                                navArgument( name = "accessToken") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                },
+                            )) { backStackEntry ->
 
                             val fullPhoneNumber = backStackEntry.arguments?.getString("fullPhoneNumber")
+                            val accessToken = backStackEntry.arguments?.getString("accessToken")
                             val repository = DriverRepository(InitializeRetrofit.driverApi)
                             val emailOtpViewModel = viewModel<EmailOtpViewModel>()
                             val signUpViewModel = viewModel<SignUpViewModel>(){
@@ -230,15 +255,37 @@ class MainActivity : ComponentActivity() {
                                 controller,
                                 screenModel = signUpViewModel,
                                 viewModel = emailOtpViewModel,
-                                email = fullPhoneNumber
+                                email = fullPhoneNumber,
+                                token = accessToken
                             )
                         }
-                        composable(route = "BioData") {
+                        composable(
+                            route = "BioData?fullPhoneNumber={fullPhoneNumber}&email={email}&accessToken={accessToken}",
+                            arguments = listOf(navArgument( name = "fullPhoneNumber") {
+                                type = NavType.StringType
+                                nullable = true
+                                defaultValue = null
+                            },
+                                navArgument( name = "email") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                },
+                                navArgument( name = "accessToken") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                    defaultValue = null
+                                }
+                            )
+                        ) { backStackEntry ->
+                            val number = backStackEntry.arguments?.getString("fullPhoneNumber") ?: ""
+                            val email = backStackEntry.arguments?.getString("email") ?: ""
+                            val token = backStackEntry.arguments?.getString("accessToken") ?: ""
                             val repository = DriverRepository(InitializeRetrofit.driverApi)
                             val biodataVM = viewModel<BioDataViewModel>(){
                                 BioDataViewModel(repository)
                             }
-                            BioData(controller, biodataVM)
+                            BioData(controller, biodataVM, number, email, token)
                         }
                         composable(route = "Onboarding") {
                             //val repository = DriverRepository(InitializeRetrofit.driverApi)
@@ -253,6 +300,15 @@ class MainActivity : ComponentActivity() {
 //                                BioDataViewModel(repository)
 //                            }
                             Welcome(controller)
+                        }
+                        composable(route = "Location") {
+                            Location(controller)
+                        }
+                        composable(route = "PhotoUpload") {
+                            PhotoUpload(controller)
+                        }
+                        composable(route = "PhotoReview") {
+                            PhotoReview(controller)
                         }
                         composable(route = "HomeScreen") {
                             HomeScreen(controller)

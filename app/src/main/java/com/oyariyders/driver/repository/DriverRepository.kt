@@ -1,6 +1,7 @@
 package com.oyariyders.driver.repository
 
 import com.oyariyders.driver.domain.model.AuthResponse
+import com.oyariyders.driver.domain.model.BioResponse
 import com.oyariyders.driver.domain.model.Driver
 import com.oyariyders.driver.domain.model.EmailRequest
 import com.oyariyders.driver.utils.Result
@@ -42,9 +43,12 @@ class DriverRepository(val api: DriverApi) {
         return Result.Success(response)
     }
 
-    suspend fun signUp(driver: Driver): Result<Unit> {
+    suspend fun signUp(driver: Driver, token: String): Result<BioResponse> {
         val response = try {
-            //api.signUp(apiKey, driver)
+            api.signUp(
+                apiKey,
+                token = "Bearer $token",
+                driver)
         }catch(e: Exception){
             return Result.Error(e.message ?: "Unknown error")
         }
@@ -52,8 +56,9 @@ class DriverRepository(val api: DriverApi) {
     }
 
     suspend fun recoverAccount(emailAddress: String): Result<Unit> {
+        val email = EmailRequest(emailAddress)
         val response = try {
-            api.recoverAccount(apiKey, emailAddress)
+            api.recoverAccount(apiKey, email)
         }catch(e: Exception){
             return Result.Error(e.message ?: "Unknown error")
         }

@@ -33,10 +33,10 @@ class BioDataViewModel (val repository: DriverRepository) : ViewModel() {
         _isLoading.value = state
     }
 
-    fun signUp(driver: Driver) {
+    fun signUp(driver: Driver, token:String) {
         viewModelScope.launch {
             _eventFlow.emit(UiEvent.Loading(true))
-            val apiResult =  repository.signUp(driver)
+            val apiResult =  repository.signUp(driver, token)
             when(apiResult){
                 is Result.Error -> {
                     _eventFlow.emit(UiEvent.Loading(false))
@@ -44,7 +44,7 @@ class BioDataViewModel (val repository: DriverRepository) : ViewModel() {
                 }
                 is Result.Success -> {
                     _eventFlow.emit(UiEvent.Loading(false))
-                    _eventFlow.emit(UiEvent.ShowSuccess("Created user account"))
+                    _eventFlow.emit(UiEvent.ShowSuccess(apiResult.data?.userMetadata?.firstname ?: "Created driver account"))
                 }
             }
         }

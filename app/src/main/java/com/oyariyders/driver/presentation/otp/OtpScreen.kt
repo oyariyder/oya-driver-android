@@ -136,7 +136,7 @@ fun OtpScreen(
                     }
 
                     is UiEvent.ShowSuccess -> {
-                        //screenModel.saveAccessToken(event.message)
+                        screenModel.saveAccessToken(event.message)
                         navigateToEmail = true
                     }
                 }
@@ -147,7 +147,7 @@ fun OtpScreen(
             if (navigateToEmail) {
                 // 3. Perform the navigation here.
                 // This effect won't be cancelled by the loading state change.
-                navController.navigate("LoginEmailPage")
+                navController.navigate("LoginEmailPage?fullPhoneNumber=${phoneNumber}&accessToken=${screenModel.accessToken.value}")
             }
         }
 

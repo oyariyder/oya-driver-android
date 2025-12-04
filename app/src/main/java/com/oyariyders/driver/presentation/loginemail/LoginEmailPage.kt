@@ -79,7 +79,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginEmailPage(
     navController: NavController,
-    loginEmailViewModel: LoginEmailViewModel
+    loginEmailViewModel: LoginEmailViewModel,
+    phoneNo: String,
+    token: String,
     ){
     val scope = rememberCoroutineScope()
     var email by remember { mutableStateOf("") }
@@ -125,29 +127,29 @@ fun LoginEmailPage(
             )
         },
     ){ innerPadding ->
-        LaunchedEffect(true) {
-            loginEmailViewModel.eventFlow.collectLatest { event ->
-                when (event) {
-                    is UiEvent.ShowMessage -> {
-                        snackbarHostState.showSnackbar(message = event.message)
-                    }
-
-                    is UiEvent.Loading -> {
-                        loginEmailViewModel.setLoadingDialogState(event.boolean)
-                    }
-                    is UiEvent.ShowSuccess -> {
-                        navigateToOtpScreen = true
-                    }
-                }
-            }
-        }
-        LaunchedEffect(navigateToOtpScreen) {
-            if (navigateToOtpScreen) {
-                // 3. Perform the navigation here.
-                // This effect won't be cancelled by the loading state change.
-                navController.navigate("EmailOtp/fullPhoneNumber=${email}")
-            }
-        }
+//        LaunchedEffect(true) {
+//            loginEmailViewModel.eventFlow.collectLatest { event ->
+//                when (event) {
+//                    is UiEvent.ShowMessage -> {
+//                        snackbarHostState.showSnackbar(message = event.message)
+//                    }
+//
+//                    is UiEvent.Loading -> {
+//                        loginEmailViewModel.setLoadingDialogState(event.boolean)
+//                    }
+//                    is UiEvent.ShowSuccess -> {
+//                        navigateToOtpScreen = true
+//                    }
+//                }
+//            }
+//        }
+//        LaunchedEffect(navigateToOtpScreen) {
+//            if (navigateToOtpScreen) {
+//                // 3. Perform the navigation here.
+//                // This effect won't be cancelled by the loading state change.
+//                navController.navigate("EmailOtp/fullPhoneNumber=${phoneNo}&accessToken=${token}")
+//            }
+//        }
 
         Column(
             modifier = Modifier
@@ -157,23 +159,23 @@ fun LoginEmailPage(
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            if (isLoading) {
-                Dialog(onDismissRequest = {
-                    loginEmailViewModel.setLoadingDialogState(false)
-                })
-                {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.width(64.dp),
-                            color = MaterialTheme.colorScheme.secondary,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                        )
-                    }
-                }
-            }
+//            if (isLoading) {
+//                Dialog(onDismissRequest = {
+//                    loginEmailViewModel.setLoadingDialogState(false)
+//                })
+//                {
+//                    Column(
+//                        verticalArrangement = Arrangement.Center,
+//                        horizontalAlignment = Alignment.CenterHorizontally
+//                    ) {
+//                        CircularProgressIndicator(
+//                            modifier = Modifier.width(64.dp),
+//                            color = MaterialTheme.colorScheme.secondary,
+//                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+//                        )
+//                    }
+//                }
+//            }
             Spacer(Modifier.height(10.dp))
             Text(
                 "Enter your email address",
@@ -305,7 +307,8 @@ fun LoginEmailPage(
             ) {
                 Button(
                     onClick = {
-                        loginEmailViewModel.sendEmailOtp(email)
+                        //loginEmailViewModel.sendEmailOtp(email)
+                        navController.navigate("EmailOtp/fullPhoneNumber=${phoneNo}&accessToken=${token}")
                     },
                     enabled = isValidEmail(email),
                     modifier = Modifier

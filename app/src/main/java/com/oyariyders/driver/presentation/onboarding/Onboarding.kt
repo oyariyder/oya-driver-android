@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,12 +66,17 @@ import com.oyariyders.driver.R
 import com.oyariyders.driver.generateSecureRandomNonce
 import com.oyariyders.driver.presentation.loginemail.isValidEmail
 import com.oyariyders.driver.signIn
+import com.oyariyders.driver.ui.theme.mostBlack
+import com.oyariyders.driver.ui.theme.DarkGrayTone
+import com.oyariyders.driver.ui.theme.GrayDark
 import com.oyariyders.driver.ui.theme.PlusJakartaSansFontFamily
+import com.oyariyders.driver.utils.AdaptiveBackground
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Onboarding(navController: NavController){
+    val background = adaptiveBackgroundProvider()
     val scope = rememberCoroutineScope()
     var email by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -78,7 +84,7 @@ fun Onboarding(navController: NavController){
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    val image = painterResource(R.drawable.rectangle)
+    val image = painterResource(getAdaptiveImage())
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -107,28 +113,51 @@ fun Onboarding(navController: NavController){
                 .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFFE3E5F0), shape = RoundedCornerShape(16.dp))
-            ) {
-                Image(
-                    painter = image,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.FillBounds,
-                )
-                Text(
-                    "A few things to set up before you begin",
-                    color = Color.Black,
-                    fontFamily = PlusJakartaSansFontFamily,
-                    modifier = Modifier.align(Alignment.Center),
-                    textAlign = TextAlign.Center,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            when(background){
+                is AdaptiveBackground.ImageResource -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color(0xFFE3E5F0))
+                    ) {
+                        Image(
+                            painter = painterResource(background.resourceId),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.FillBounds,
+                        )
+                        Text(
+                            "A few things to set up before you begin",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontFamily = PlusJakartaSansFontFamily,
+                            modifier = Modifier.align(Alignment.Center),
+                            textAlign = TextAlign.Center,
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                is AdaptiveBackground.SolidColor -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(background.color)
+                    ) {
+                        Text(
+                            "A few things to set up before you begin",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontFamily = PlusJakartaSansFontFamily,
+                            modifier = Modifier.align(Alignment.Center),
+                            textAlign = TextAlign.Center,
+                            fontSize = 32.sp,
+                            lineHeight = 36.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
 
+                is AdaptiveBackground.SolidBrush -> TODO()
+            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -138,7 +167,8 @@ fun Onboarding(navController: NavController){
             ) {
                 Icon(
                     painter = painterResource(R.drawable.location_add),
-                    contentDescription = "Location Add Icon"
+                    contentDescription = "Location Add Icon",
+                    tint = getAdaptiveTintColor(),
                 )
                 Spacer(Modifier.width(16.dp))
                 Column(
@@ -155,7 +185,7 @@ fun Onboarding(navController: NavController){
                     )
                     Text(
                         "Choose the city where you’ll be driving and earning.",
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = getAdaptiveSubtitleTextColor(),
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -171,7 +201,8 @@ fun Onboarding(navController: NavController){
             ) {
                 Icon(
                     painter = painterResource(R.drawable.profile_tick),
-                    contentDescription = "Profile Tick Icon"
+                    contentDescription = "Profile Tick Icon",
+                    tint = getAdaptiveTintColor()
                 )
                 Spacer(Modifier.width(16.dp))
                 Column(
@@ -188,7 +219,7 @@ fun Onboarding(navController: NavController){
                     )
                     Text(
                         "Upload a clear photo for easy recognition and identity verification.",
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = getAdaptiveSubtitleTextColor(),
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -204,7 +235,8 @@ fun Onboarding(navController: NavController){
             ) {
                 Icon(
                     painter = painterResource(R.drawable.driverlicense),
-                    contentDescription = "Driver License Icon"
+                    contentDescription = "Driver License Icon",
+                    tint = getAdaptiveTintColor()
                 )
                 Spacer(Modifier.width(16.dp))
                 Column(
@@ -221,7 +253,7 @@ fun Onboarding(navController: NavController){
                     )
                     Text(
                         "Add a valid driver’s license for the location you want to drive in.",
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = getAdaptiveSubtitleTextColor(),
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -237,7 +269,8 @@ fun Onboarding(navController: NavController){
             ) {
                 Icon(
                     painter = painterResource(R.drawable.car_icon),
-                    contentDescription = "Car Icon"
+                    contentDescription = "Car Icon",
+                    tint = getAdaptiveTintColor()
                 )
                 Spacer(Modifier.width(16.dp))
                 Column(
@@ -254,7 +287,7 @@ fun Onboarding(navController: NavController){
                     )
                     Text(
                         "Pick the type of vehicle you’ll use for rides",
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = getAdaptiveSubtitleTextColor(),
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -270,7 +303,8 @@ fun Onboarding(navController: NavController){
             ) {
                 Icon(
                     painter = painterResource(R.drawable.document_text),
-                    contentDescription = "Document Icon"
+                    contentDescription = "Document Icon",
+                    tint = getAdaptiveTintColor()
                 )
                 Spacer(Modifier.width(16.dp))
                 Column(
@@ -287,7 +321,7 @@ fun Onboarding(navController: NavController){
                     )
                     Text(
                         "Provide the Insurance Policy documents and Vehicle Inspection Report for your vehicle to be approved.",
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = getAdaptiveSubtitleTextColor(),
                         fontFamily = PlusJakartaSansFontFamily,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
@@ -329,5 +363,45 @@ fun Onboarding(navController: NavController){
                 }
             }
         }
+    }
+}
+
+@Composable
+fun getAdaptiveSubtitleTextColor(): Color {
+    // isSystemInDarkTheme() returns true if the system's dark theme is currently active.
+    return if (isSystemInDarkTheme()) {
+        GrayDark // Lighter color for better contrast in Dark Mode
+    } else {
+        Color.Black // Original color for Light Mode
+    }
+}
+
+@Composable
+fun getAdaptiveTintColor(): Color {
+    return if (isSystemInDarkTheme()){
+        DarkGrayTone
+    } else {
+        mostBlack
+    }
+}
+
+@Composable
+fun getAdaptiveImage(): Int{
+    return if (isSystemInDarkTheme()){
+        R.drawable.darkrectangle
+    } else {
+        R.drawable.rectangle
+    }
+}
+
+@Composable
+fun adaptiveBackgroundProvider(): AdaptiveBackground {
+    return if (isSystemInDarkTheme()) {
+        // Dark Mode: Return an almost transparent background (fully transparent Black in this case)
+        // If you wanted 'almost' transparent, you could use Color(0x22000000) for 13.7% opacity black
+        AdaptiveBackground.SolidColor(Color.Transparent)
+    } else {
+        // Light Mode: Return the image resource ID
+        AdaptiveBackground.ImageResource(R.drawable.rectangle)
     }
 }

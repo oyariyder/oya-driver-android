@@ -68,6 +68,7 @@ fun EmailOtp(
     screenModel: SignUpViewModel,
     viewModel: EmailOtpViewModel,
     email: String? = "johnasalu13@gmail.com",
+    token: String? = ""
 ){
     val snackbarHostState = remember { SnackbarHostState() }
     // 2. Collect the UI state. Your UI will automatically recompose when this state changes.
@@ -111,32 +112,32 @@ fun EmailOtp(
             )
         },
     ){ innerPadding ->
-        LaunchedEffect(true) {
-            screenModel.eventFlow.collectLatest { event ->
-                when (event) {
-                    is UiEvent.ShowMessage -> {
-                        snackbarHostState.showSnackbar(message = event.message)
-                    }
+//        LaunchedEffect(true) {
+//            screenModel.eventFlow.collectLatest { event ->
+//                when (event) {
+//                    is UiEvent.ShowMessage -> {
+//                        snackbarHostState.showSnackbar(message = event.message)
+//                    }
+//
+//                    is UiEvent.Loading -> {
+//                        screenModel.setLoadingDialogState(event.boolean)
+//                    }
+//
+//                    is UiEvent.ShowSuccess -> {
+//                        //snackbarHostState.showSnackbar(message = event.message)
+//                        navigateToBioData = true
+//                    }
+//                }
+//            }
+//        }
 
-                    is UiEvent.Loading -> {
-                        screenModel.setLoadingDialogState(event.boolean)
-                    }
-
-                    is UiEvent.ShowSuccess -> {
-                        //snackbarHostState.showSnackbar(message = event.message)
-                        navigateToBioData = true
-                    }
-                }
-            }
-        }
-
-        LaunchedEffect(navigateToBioData) {
-            if (navigateToBioData) {
-                // 3. Perform the navigation here.
-                // This effect won't be cancelled by the loading state change.
-                navController.navigate("BioData")
-            }
-        }
+//        LaunchedEffect(navigateToBioData) {
+//            if (navigateToBioData) {
+//                // 3. Perform the navigation here.
+//                // This effect won't be cancelled by the loading state change.
+//                navController.navigate("BioData")
+//            }
+//        }
 
         Column(
             modifier = Modifier
@@ -145,23 +146,23 @@ fun EmailOtp(
                 .padding(innerPadding),
         ){
             // You can now use signUpUiState to control dialogs, show errors, etc.
-            if (signUpUiState.showLoadingDialog) {
-                Dialog(onDismissRequest = {
-                    screenModel.setLoadingDialogState(false)
-                })
-                {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.width(64.dp),
-                            color = MaterialTheme.colorScheme.secondary,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                        )
-                    }
-                }
-            }
+//            if (signUpUiState.showLoadingDialog) {
+//                Dialog(onDismissRequest = {
+//                    screenModel.setLoadingDialogState(false)
+//                })
+//                {
+//                    Column(
+//                        verticalArrangement = Arrangement.Center,
+//                        horizontalAlignment = Alignment.CenterHorizontally
+//                    ) {
+//                        CircularProgressIndicator(
+//                            modifier = Modifier.width(64.dp),
+//                            color = MaterialTheme.colorScheme.secondary,
+//                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+//                        )
+//                    }
+//                }
+//            }
             OtpArea(
                 navController = navController,
                 phoneNumber = email,
@@ -176,14 +177,16 @@ fun EmailOtp(
                 },
                 onVerifyOtp = {
                     // 1. Call the ViewModel to handle the verification logic
-                    screenModel.verifyOtp(email ?: "")
+                    //screenModel.verifyOtp(email ?: "")
+                    navController.navigate("BioData?fullPhoneNumber=${email}&accessToken=${token}")
                 },
                 screenModel = screenModel
             )
             Spacer(Modifier.height(16.dp))
             Button(
                 onClick = {
-                    screenModel.verifyOtp(email ?: "")
+                    //screenModel.verifyOtp(email ?: "")
+                    navController.navigate("BioData?fullPhoneNumber=${email}&accessToken=${token}")
                 },
                 modifier = Modifier
                     .fillMaxWidth()

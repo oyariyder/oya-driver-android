@@ -64,7 +64,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun BioData(
     navController: NavController,
-    viewModel: BioDataViewModel
+    viewModel: BioDataViewModel,
+    phoneNumber: String? = null,
+    email: String? = null,
+    token: String,
 ){
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -72,8 +75,9 @@ fun BioData(
     val isLoading by viewModel.isLoading.collectAsState()
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
-    var phoneNumber by remember { mutableStateOf("") }
+    var phoneNo by remember { mutableStateOf("") }
     var emailAddress by remember { mutableStateOf("") }
+    var navigateToOnboard by remember { mutableStateOf(false) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -121,9 +125,16 @@ fun BioData(
                     }
 
                     is UiEvent.ShowSuccess -> {
-
+                        navigateToOnboard = true
                     }
                 }
+            }
+        }
+        LaunchedEffect(navigateToOnboard) {
+            if (navigateToOnboard) {
+                // 3. Perform the navigation here.
+                // This effect won't be cancelled by the loading state change.
+                navController.navigate("Onboarding")
             }
         }
 
@@ -186,7 +197,7 @@ fun BioData(
                 ),
                 onValueChange = {
                     firstName = it
-                    viewModel.toggleButtonState(phoneNumber.isNotEmpty())
+                    viewModel.toggleButtonState(firstName.isNotEmpty())
                 },
                 placeholder = { Text("Your first name") }
             )
@@ -219,13 +230,77 @@ fun BioData(
                 },
                 placeholder = { Text("Your last name") }
             )
+            if (email.isNullOrEmpty()){
+                Spacer(Modifier.height(8.dp))
+                TextField(
+                    value = emailAddress,
+                    isError = emailAddress.isEmpty(),
+                    shape = RoundedCornerShape(12.dp),
+                    textStyle = TextStyle(
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    colors = TextFieldDefaults.colors(
+                        // Set all indicator colors to transparent for all states:
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
+
+                        // Optional: Keep the container color for better visual separation
+                        // If you don't set this, it defaults to the surface color.
+                        unfocusedContainerColor = Color.White,
+                        focusedContainerColor = Color.White
+                    ),
+                    onValueChange = {
+                        emailAddress = it
+                        viewModel.toggleButtonState(emailAddress.isNotEmpty())
+                    },
+                    placeholder = { Text("Your Email address") }
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+            if (phoneNumber.isNullOrEmpty()){
+                Spacer(Modifier.height(8.dp))
+                TextField(
+                    value = phoneNo,
+                    isError = phoneNo.isEmpty(),
+                    shape = RoundedCornerShape(12.dp),
+                    textStyle = TextStyle(
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    colors = TextFieldDefaults.colors(
+                        // Set all indicator colors to transparent for all states:
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent,
+
+                        // Optional: Keep the container color for better visual separation
+                        // If you don't set this, it defaults to the surface color.
+                        unfocusedContainerColor = Color.White,
+                        focusedContainerColor = Color.White
+                    ),
+                    onValueChange = {
+                        phoneNo = it
+                        viewModel.toggleButtonState(phoneNo.isNotEmpty())
+                    },
+                    placeholder = { Text("Your Phone Number") }
+                )
+                Spacer(Modifier.height(8.dp))
+            }
             Spacer(Modifier.height(48.dp))
             Button(
                 onClick = {
-                    val userData = UserData(firstName, phoneNumber)
-                    val driver = Driver(firstName, "1234567",userData)
+                    val userData = UserData(firstName, if(phoneNumber.isNullOrEmpty()) phoneNo else phoneNumber)
+                    val driver = Driver(data = userData)
                     scope.launch {
-                        viewModel.signUp(driver)
+                        viewModel.signUp(driver, token)
                     }
                 },
                 enabled = shouldContinue,

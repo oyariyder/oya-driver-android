@@ -1,6 +1,7 @@
 package com.oyariyders.driver.retrofit
 
 import com.oyariyders.driver.domain.model.AuthResponse
+import com.oyariyders.driver.domain.model.BioResponse
 import com.oyariyders.driver.domain.model.Driver
 import com.oyariyders.driver.domain.model.EmailRequest
 import com.oyariyders.driver.domain.model.OTP
@@ -33,11 +34,11 @@ interface DriverApi {
         @Header("apiKey") apiKey: String,
         @Header("Authorization") token: String,
         @Body driver: Driver
-    )
+    ): BioResponse
 
     @POST("/auth/v1/reset-password")
     suspend fun recoverAccount(
         @Header("apiKey") apiKey: String,
-        @Body emailAddress: String
+        @Body emailAddress: EmailRequest
     )
 }
