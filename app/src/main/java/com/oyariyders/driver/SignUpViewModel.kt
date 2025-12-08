@@ -30,7 +30,7 @@ data class SignUpUiState(
 )
 
 // 2. Your ViewModel
-class SignUpViewModel(val repository: DriverRepository) : ViewModel() {
+class SignUpViewModel(val repository: DriverRepository, private val authPersistenceManager: AuthPersistenceManager) : ViewModel() {
 
     private val _signUpUiState = MutableStateFlow(SignUpUiState())
     val signUpUiState: StateFlow<SignUpUiState> = _signUpUiState.asStateFlow()
@@ -127,6 +127,12 @@ class SignUpViewModel(val repository: DriverRepository) : ViewModel() {
                 }
                 is Result.Success -> {
                     _eventFlow.emit(UiEvent.Loading(false))
+                    // IMPORTANT: Safely access the AuthResponse and save it
+                    val authResponse = apiResult.data
+                    if (authResponse != null){
+                        // Call the suspend function to save the data securely
+                        authPersistenceManager.saveAuthData(authResponse)
+                    }
                     _eventFlow.emit(UiEvent.ShowSuccess(apiResult.data?.accessToken.toString()))
                 }
             }

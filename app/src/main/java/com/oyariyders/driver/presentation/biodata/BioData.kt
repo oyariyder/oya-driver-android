@@ -71,6 +71,7 @@ fun BioData(
 ){
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    var accessToken by remember { mutableStateOf("") }
     val shouldContinue by viewModel.shouldContinue.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     var firstName by remember { mutableStateOf("") }
@@ -298,9 +299,10 @@ fun BioData(
             Button(
                 onClick = {
                     val userData = UserData(firstName, if(phoneNumber.isNullOrEmpty()) phoneNo else phoneNumber)
-                    val driver = Driver(data = userData)
+                    val driver = Driver(if (email.isNullOrEmpty()) emailAddress else email,data = userData)
                     scope.launch {
-                        viewModel.signUp(driver, token)
+                        accessToken = viewModel.getAccessToken() ?: ""
+                        viewModel.signUp(driver, accessToken)
                     }
                 },
                 enabled = shouldContinue,

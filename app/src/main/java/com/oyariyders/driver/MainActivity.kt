@@ -31,8 +31,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.credentials.CredentialManager
@@ -69,6 +71,7 @@ import com.oyariyders.driver.presentation.otp.OTPScreenViewModel
 import com.oyariyders.driver.presentation.otp.OtpScreen
 import com.oyariyders.driver.presentation.phonenumberoptions.PhoneNumberOptions
 import com.oyariyders.driver.presentation.phonenumberoptions.PhoneNumberOptionsViewModel
+import com.oyariyders.driver.presentation.selectvechicle.SearchVehicle
 import com.oyariyders.driver.presentation.welcome.Welcome
 import com.oyariyders.driver.repository.DriverRepository
 import com.oyariyders.driver.retrofit.InitializeRetrofit
@@ -109,7 +112,7 @@ class MainActivity : ComponentActivity() {
                     DeepLinkHandler(controller, currentAppIntent)
                     NavHost(
                         navController = controller,
-                        startDestination = "BrandPage",
+                        startDestination = "SearchVehicle",
                         enterTransition = { EnterTransition.None },
                         exitTransition = { ExitTransition.None }
                     ){
@@ -193,13 +196,17 @@ class MainActivity : ComponentActivity() {
                                 nullable = true
                                 defaultValue = null
                             })){ backStackEntry ->
-
+                            val context = LocalContext.current
+                            // 1. Create the AuthPersistenceManager instance using the context
+                            val authPersistenceManager = remember {
+                                AuthPersistenceManager(context)
+                            }
                             val fullPhoneNumber = backStackEntry.arguments?.getString("fullPhoneNumber")
                             val repository = DriverRepository(InitializeRetrofit.driverApi)
 
                             val otpScreenOptionsViewModel = viewModel<OTPScreenViewModel>()
                             val signUpViewModel = viewModel<SignUpViewModel>(){
-                                SignUpViewModel(repository)
+                                SignUpViewModel(repository, authPersistenceManager)
                             }
                             OtpScreen(
                                 controller,
@@ -243,13 +250,17 @@ class MainActivity : ComponentActivity() {
                                     defaultValue = null
                                 },
                             )) { backStackEntry ->
-
+                            val context = LocalContext.current
+                            // 1. Create the AuthPersistenceManager instance using the context
+                            val authPersistenceManager = remember {
+                                AuthPersistenceManager(context)
+                            }
                             val fullPhoneNumber = backStackEntry.arguments?.getString("fullPhoneNumber")
                             val accessToken = backStackEntry.arguments?.getString("accessToken")
                             val repository = DriverRepository(InitializeRetrofit.driverApi)
                             val emailOtpViewModel = viewModel<EmailOtpViewModel>()
                             val signUpViewModel = viewModel<SignUpViewModel>(){
-                                SignUpViewModel(repository)
+                                SignUpViewModel(repository, authPersistenceManager)
                             }
                             EmailOtp(
                                 controller,
@@ -278,12 +289,17 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         ) { backStackEntry ->
+                            val context = LocalContext.current
+                            // 1. Create the AuthPersistenceManager instance using the context
+                            val authPersistenceManager = remember {
+                                AuthPersistenceManager(context)
+                            }
                             val number = backStackEntry.arguments?.getString("fullPhoneNumber") ?: ""
                             val email = backStackEntry.arguments?.getString("email") ?: ""
                             val token = backStackEntry.arguments?.getString("accessToken") ?: ""
                             val repository = DriverRepository(InitializeRetrofit.driverApi)
                             val biodataVM = viewModel<BioDataViewModel>(){
-                                BioDataViewModel(repository)
+                                BioDataViewModel(repository, authPersistenceManager)
                             }
                             BioData(controller, biodataVM, number, email, token)
                         }
@@ -303,6 +319,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(route = "Location") {
                             Location(controller)
+                        }
+                        composable(route = "SearchVehicle") {
+                            SearchVehicle(controller)
                         }
                         composable(route = "PhotoUpload") {
                             PhotoUpload(controller)

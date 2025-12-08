@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.oyariyders.driver.AuthPersistenceManager
 import com.oyariyders.driver.domain.model.Driver
 import com.oyariyders.driver.presentation.UiEvent
 import com.oyariyders.driver.utils.Result
@@ -14,7 +15,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class BioDataViewModel (val repository: DriverRepository) : ViewModel() {
+class BioDataViewModel (val repository: DriverRepository, private val authPersistenceManager: AuthPersistenceManager) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -31,6 +32,10 @@ class BioDataViewModel (val repository: DriverRepository) : ViewModel() {
 
     fun setLoadingDialogState(state: Boolean){
         _isLoading.value = state
+    }
+
+    suspend fun getAccessToken():String? {
+        return authPersistenceManager.getAccessToken()
     }
 
     fun signUp(driver: Driver, token:String) {

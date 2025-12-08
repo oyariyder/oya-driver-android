@@ -59,6 +59,7 @@ dependencies {
     // Google Maps for Compose
     implementation(libs.google.maps.compose)
     implementation(libs.google.play.services.maps)
+    implementation("androidx.security:security-crypto:1.1.0")
     implementation(libs.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.kotlinx.serialization.json)

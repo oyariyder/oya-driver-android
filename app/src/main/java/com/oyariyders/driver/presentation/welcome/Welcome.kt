@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.oyariyders.driver.R
 import com.oyariyders.driver.presentation.onboarding.adaptiveBackgroundProvider
+import com.oyariyders.driver.ui.theme.DarkBrownTaupe
 import com.oyariyders.driver.ui.theme.MediumGray
 import com.oyariyders.driver.ui.theme.PalePeach
 import com.oyariyders.driver.ui.theme.PlusJakartaSansFontFamily
@@ -494,7 +496,10 @@ fun Welcome(navController: NavController){
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(8.dp)
+                    .clickable(enabled = true, onClick = {
+                        navController.navigate("PhotoUpload")
+                    }),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -555,7 +560,10 @@ fun Welcome(navController: NavController){
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(8.dp)
+                    .clickable(enabled = true, onClick = {
+                        navController.navigate("SearchVehicle")
+                    }),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -695,7 +703,7 @@ fun getAdaptiveIconColor(): Color {
     return if (isSystemInDarkTheme()) {
         vividOrange // Lighter color for better contrast in Dark Mode
     } else {
-        Color.White // Original color for Light Mode
+        DarkBrownTaupe // Original color for Light Mode
     }
 }
 @Composable
